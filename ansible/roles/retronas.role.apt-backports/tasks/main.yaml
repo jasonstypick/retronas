@@ -1,10 +1,11 @@
+---
 - name: "{{ my_name }} - Load RetroNAS config"
   ansible.builtin.include_vars: retronas_vars.yml
 
 - name: "{{ my_name }} - install prerequisite packages"
   ansible.builtin.package:
-      name: "{{ packages }}"
-      state: latest
+    name: "{{ packages }}"
+    state: latest
 
 - name: "{{ my_name }} - discover signing key"
   ansible.builtin.shell:
@@ -30,7 +31,7 @@
     repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main contrib non-free
     state: present
     filename: debian-backports
-    update_cache: no
+    update_cache: false
   when: ansible_distribution == "Debian"
 
 - name: "{{ my_name }} - Configure APT repo for Ubuntu x86_64"
@@ -38,7 +39,7 @@
     repo: deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-backports main restricted universe multiverse
     state: present
     filename: "{{ ansible_distribution_release }}-backports"
-    update_cache: no
+    update_cache: false
   when: ansible_distribution == "Ubuntu" and
         ansible_architecture == "x86_64"
 
@@ -47,7 +48,7 @@
     repo: deb http://ports.ubuntu.com/ {{ ansible_distribution_release }}-backports main restricted universe multiverse
     state: present
     filename: "{{ ansible_distribution_release }}-backports"
-    update_cache: no
+    update_cache: false
   when: ansible_distribution == "Ubuntu" and
         ansible_architecture != "x86_64"
 
