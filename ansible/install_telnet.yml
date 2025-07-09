@@ -1,52 +1,49 @@
 ---
 - hosts: localhost
-  gather_facts: no
+  gather_facts: true
 
   vars:
     my_name: "Telnet"
     my_file: "install_telnet"
     module_name: "telnet"
 
-    firewalld_rules:
-      - { zone: "retro", service: "telnet" }
-
     templates:
-      - { name: "telnet", dest: "/etc/xinetd.d", force: no }
+      - { name: "telnet", dest: "/etc/xinetd.d", force: false }
 
     firewalld_rules:
       - { zone: "retro", service: "telnet" }
 
     packages:
-         - telnet
-         - telnetd
-         - xinetd
+      - telnet
+      - telnetd
+      - xinetd
 
   tasks:
 
-  - name: "{{ my_name }} - Load RetroNAS config"
-    ansible.builtin.include_vars: retronas_vars.yml
+    - name: "{{ my_name }} - Load RetroNAS config"
+      ansible.builtin.include_vars: retronas_vars.yml
 
-  - ansible.builtin.import_role:
-      name: retronas.role.package.latest
+    - ansible.builtin.import_role:
+        name: retronas.role.package.latest
 
-  - name: "{{ my_name }} - Enable startup services"
-    ansible.builtin.service:
-      name: xinetd
-      state: started
-      enabled: yes
+    - name: "{{ my_name }} - Enable startup services"
+      ansible.builtin.service:
+        name: xinetd
+        state: started
+        enabled: true
 
-  - ansible.builtin.import_role:
-      name: retronas.role.templates
+    - ansible.builtin.import_role:
+        name: retronas.role.templates
 
-  - ansible.builtin.import_role:
-      name: retronas.role.firewalld.port
+    - ansible.builtin.import_role:
+        name: retronas.role.firewalld.port
 
-  - ansible.builtin.import_role:
-      name: retronas.role.system-config
+    - ansible.builtin.import_role:
+        name: retronas.role.system-config
 
   handlers:
 
-  - name: "{{ my_name }} - Restart services"
-    ansible.builtin.service:
-      name: xinetd
-      state: restarted
+    - name: "{{ my_name }} - Restart services"
+      ansible.builtin.service:
+        name: xinetd
+        state: restarted

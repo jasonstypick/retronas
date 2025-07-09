@@ -2,5 +2,5 @@
   ansible.builtin.package:
     name: "{{ packages }}"
     state: latest
-    update_cache: yes
-  become: yes
+    update_cache: true
+  become: true

@@ -1,6 +1,6 @@
 ---
 - hosts: localhost
-  gather_facts: yes
+  gather_facts: true
 
   vars:
     my_name: "cockpit-retronas"
@@ -39,5 +39,5 @@
     ansible.builtin.command:
       cmd: "{{ retronas_root }}/scripts/{{ my_file }}.sh"
 
-  -  ansible.builtin.include_role:
+  - ansible.builtin.include_role:
       name: retronas.role.system-config

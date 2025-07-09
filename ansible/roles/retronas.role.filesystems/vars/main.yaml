@@ -16,4 +16,4 @@ packages:
   - udisks2
   - udisks2-btrfs
   - udisks2-lvm2
-  - udisks2-zram
+  #- udisks2-zram

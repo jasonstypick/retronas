@@ -1,5 +1,6 @@
+---
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
 
   vars:
     my_name: "far2l"
@@ -7,19 +8,19 @@
     module_name: "far2l"
 
     packages:
-      - gawk 
+      - gawk
       - m4
-      - libpcre3-dev 
-      - libxerces-c-dev 
-      - libspdlog-dev 
+      - libpcre2-dev
+      - libxerces-c-dev
+      - libspdlog-dev
       - libuchardet-dev
-      - libssh-dev 
-      - libssl-dev 
-      - libsmbclient-dev 
-      - libnfs-dev 
-      - libneon27-dev 
-      - libarchive-dev 
-      - cmake 
+      - libssh-dev
+      - libssl-dev
+      - libsmbclient-dev
+      - libnfs-dev
+      - libneon27-dev
+      - libarchive-dev
+      - cmake
       - g++
       - gcc
       - git
@@ -29,18 +30,18 @@
 
   tasks:
 
-  - name: "{{ my_name }} - Load RetroNAS config"
-    ansible.builtin.include_vars: retronas_vars.yml
+    - name: "{{ my_name }} - Load RetroNAS config"
+      ansible.builtin.include_vars: retronas_vars.yml
 
-  - ansible.builtin.import_role:
-      name: retronas.role.package.latest
+    - ansible.builtin.import_role:
+        name: retronas.role.package.latest
 
-  - ansible.builtin.import_role:
-      name: retronas.role.templates
+    - ansible.builtin.import_role:
+        name: retronas.role.templates
 
-  - name: "{{ my_name }} - build source"
-    ansible.builtin.command:
-      cmd: "{{ retronas_root }}/scripts/{{ my_file }}.sh"
+    - name: "{{ my_name }} - build source"
+      ansible.builtin.command:
+        cmd: "{{ retronas_root }}/scripts/{{ my_file }}.sh"
 
-  - ansible.builtin.import_role:
-      name: retronas.role.system-config
+    - ansible.builtin.import_role:
+        name: retronas.role.system-config
