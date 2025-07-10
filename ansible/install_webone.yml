@@ -1,6 +1,6 @@
 ---
 - hosts: localhost
-  gather_facts: no
+  gather_facts: true
 
   vars:
     my_name: "WebOne proxy"
@@ -9,10 +9,17 @@
 
     packages:
       - git
-      - imagemagick-6.q16
-      - imagemagick-6-common
       - ffmpeg
       - coreutils
+
+    packages_debian:
+      debian12:
+        - imagemagick-6.q16
+        - imagemagick-6-common
+      debian13:
+        - imagemagick-7.q16
+        - imagemagick-7-common
+
 
     templates:
       - { name: "{{ my_file }}.sh", dest: "{{ retronas_root }}/scripts", mode: "0755" }
@@ -23,38 +30,45 @@
 
   tasks:
 
-  - name: "{{ my_name }} - Load RetroNAS config"
-    ansible.builtin.include_vars: retronas_vars.yml
+    - name: "{{ my_name }} - Load RetroNAS config"
+      ansible.builtin.include_vars: retronas_vars.yml
 
-  - ansible.builtin.import_role:
-      name: retronas.role.package.latest
-    notify: "{{ my_name }} - Restart service"
+    - ansible.builtin.import_role:
+        name: retronas.role.package.latest
+      notify: "{{ my_name }} - Restart service"
 
-  - ansible.builtin.import_role:
-      name: retronas.role.dotnetcore6
+    - ansible.builtin.import_role:
+        name: retronas.role.package.latest
+      vars:
+        packages: "{{ packages_debian['debian' + ansible_distribution_major_version ] }}"
+      when: ansible_distribution == 'Debian'
+      notify: "{{ my_name }} - Restart service"
 
-  - ansible.builtin.import_role:
-      name: retronas.role.templates
-    notify: "{{ my_name }} - Restart service"
+    - ansible.builtin.import_role:
+        name: retronas.role.dotnetcore6
 
-  - name: "{{ my_name }} - Run installer"
-    ansible.builtin.shell:
-      cmd: "./{{ my_file }}.sh 2>&1 | tee {{ retronas_root }}/log/{{ my_file }}.log"
-      chdir: "{{ retronas_root }}/scripts"
-      executable: /bin/bash
-      creates: "{{ retronas_root }}/bin/webone/webone"
-    notify: "{{ my_name }} - Restart service"
+    - ansible.builtin.import_role:
+        name: retronas.role.templates
+      notify: "{{ my_name }} - Restart service"
 
-  - ansible.builtin.import_role:
-      name: retronas.role.firewalld.port
+    - name: "{{ my_name }} - Run installer"
+      ansible.builtin.shell:
+        cmd: "./{{ my_file }}.sh 2>&1 | tee {{ retronas_root }}/log/{{ my_file }}.log"
+        chdir: "{{ retronas_root }}/scripts"
+        executable: /bin/bash
+        creates: "{{ retronas_root }}/bin/webone/webone"
+      notify: "{{ my_name }} - Restart service"
 
-  - ansible.builtin.import_role:
-      name: retronas.role.system-config
+    - ansible.builtin.import_role:
+        name: retronas.role.firewalld.port
+
+    - ansible.builtin.import_role:
+        name: retronas.role.system-config
 
   handlers:
 
-  - name: "{{ my_name }} - Restart service"
-    ansible.builtin.service:
-      name: webone
-      state: restarted
-      daemon_reload: yes
+    - name: "{{ my_name }} - Restart service"
+      ansible.builtin.service:
+        name: webone
+        state: restarted
+        daemon_reload: true
