@@ -40,5 +40,5 @@ dl_install() {
     fi
 }
 
-RELEASE=$(curl -skJL https://api.github.com/repos/${ORG}/${REPO}/releases | jq -r ".[0].assets | map(select(.name | match (\"linux-x64_release\")))[-1] | .browser_download_url" )
+RELEASE=$(curl -skJL https://api.github.com/repos/${ORG}/${REPO}/releases | jq -r ".[0].assets | map(select(.name | match (\"linux-${ARCH}_release\")))[-1] | .browser_download_url" )
 dl_install $RELEASE
