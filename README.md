@@ -1,7 +1,5 @@
-<p align="right" width="100%">
 ![logo](dist/retronas-logo.png)
 # RetroNAS
-</p>
 
 ## Project Information
 * [Status](https://github.com/retronas/retronas/wiki/Status)
