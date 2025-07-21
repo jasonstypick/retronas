@@ -18,14 +18,14 @@
 
 
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
 
   vars:
     my_name: "network-presets-zoned"
     my_file: "install_{{ my_name }}"
 
     templates:
-      - { name: "dhcpcd.conf",         dest: "/etc",  mode: "0640", force: "yes" }
+      - { name: "dhcpcd.conf", dest: "/etc", mode: "0640", force: "yes" }
 
     connections:
       - { name: "ethernet", state: "absent" }  # remove it first because modules are a pain some times
