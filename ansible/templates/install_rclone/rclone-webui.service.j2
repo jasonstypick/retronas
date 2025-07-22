@@ -1,0 +1,14 @@
+﻿[Unit]
+Description=rclone webui
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ retronas_user }}
+ExecStart=/usr/bin/rclone rcd --rc-web-gui --rc-web-gui-no-open-browser --rc-addr 0.0.0.0:5572 --rc-htpasswd /etc/retronas.htpasswd
+TimeoutStopSec=10
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

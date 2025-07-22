@@ -1,0 +1,78 @@
+{
+    "menu": 
+    {
+        "title": "rclone",
+        "description": "Install rclone",
+        "id":"rclone",
+        "prompt": "",
+        "type": "menu",
+        "items": [
+            {
+                "index": "01",
+                "title": "Back",
+                "description": "Return to previous menu", 
+                "id":"",
+                "prompt": "",
+                "type": "menu",
+                "group":"",
+                "command": "EXIT_OK",
+                "args": ""
+            },
+            {
+                "index":"02",
+                "title": "Install",
+                "description": "Install rclone",
+                "id":"rclone",
+                "prompt": "",
+                "type": "install",
+                "group":"",
+                "command": "rclone",
+                "args": ""
+            },
+            {
+                "index":"20",
+                "title": "Start",
+                "description": "Start webui service",
+                "id":"",
+                "prompt": "",
+                "type": "service_start",
+                "group":"",
+                "command": "rclone-webui",
+                "args": ""
+            },
+            {
+                "index":"21",
+                "title": "Status",
+                "description": "Query webui status",
+                "id":"",
+                "prompt": "",
+                "type":"service_status",
+                "group":"",
+                "command": "rclone-webui",
+                "args": ""
+            },
+            {
+                "index":"22",
+                "title": "Stop",
+                "description": "Stop webui service",
+                "id":"",
+                "prompt": "",
+                "type": "service_stop",
+                "group":"",
+                "command": "rclone-webui",
+                "args": ""
+            },
+            {
+                "index":"99",
+                "title": "Documentation",
+                "description": "Read the service documentation",
+                "id":"",
+                "prompt": "",
+                "type": "documentation",
+                "group":"",
+                "command": "rclone.md",
+                "args": ""
+            }
+        ]
+    }
+}

@@ -1,0 +1,54 @@
+---
+- hosts: localhost
+  gather_facts: false
+
+  vars:
+    my_name: "rclone"
+    my_file: "install_rclone"
+    module_name: "rclone"
+
+    packages:
+      - rclone
+
+    templates:
+      - { name: "{{ my_name }}-webui.service", dest: "/etc/systemd/system", mode: "0644" }
+
+    services:
+      - "{{ my_name }}-webui.service"
+
+    firewalld_ports:
+      - { port: 5572, protocol: tcp, zone: retro }
+      - { port: 5572, protocol: tcp, zone: modern }
+
+  tasks:
+
+    - name: "{{ my_name }} - Load RetroNAS config"
+      ansible.builtin.include_vars: retronas_vars.yml
+
+    - ansible.builtin.import_role:
+        name: retronas.role.package.latest
+      notify: "{{ my_name }} - Restart service"
+
+    - ansible.builtin.import_role:
+        name: retronas.role.templates
+      notify: "{{ my_name }} - Restart service"
+
+    - ansible.builtin.import_role:
+        name: retronas.role.htpasswd
+      notify: "{{ my_name }} - Restart service"
+
+    - ansible.builtin.import_role:
+        name: retronas.role.firewalld.port
+
+    - ansible.builtin.import_role:
+        name: retronas.role.system-config
+
+  handlers:
+
+    - name: "{{ my_name }} - Restart service"
+      ansible.builtin.service:
+        name: "{{ item }}"
+        enabled: true
+        state: restarted
+        daemon_reload: true
+      loop: "{{ services }}"
