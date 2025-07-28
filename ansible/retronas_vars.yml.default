@@ -1,6 +1,6 @@
 retronas_path: "/data/retronas"
-retronas_user: "pi"
-retronas_group: "pi"
+retronas_user: "retronas"
+retronas_group: "retronas"
 retronas_root: "/opt/retronas"
 retronas_net_retro_interface: "eth0"
 retronas_net_retro_ip: "10.99.1.1"
