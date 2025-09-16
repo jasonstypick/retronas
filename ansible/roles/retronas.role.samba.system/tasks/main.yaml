@@ -56,7 +56,7 @@
     state: link
   loop: "{{ internal_symlinks|product(top_level_paths)|list }}"
   when: internal_symlinks is defined and
-        top_level_path is defined
+        top_level_paths is defined
 
 - name: "{{ my_name }} - build internal directory layout"
   ansible.builtin.file:
@@ -67,7 +67,7 @@
     state: link
   loop: "{{ internal_symlinks }}"
   when: internal_symlinks is defined and
-        top_level_path is not defined
+        top_level_paths is not defined
 
 - name: "{{ my_name }} - configure includes file"
   ansible.builtin.ini_file:
