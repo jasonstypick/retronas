@@ -53,46 +53,51 @@
       register: result
       failed_when:
         - result.rc >= 2
+      when:
+        - ansible_distribution == "Debian"
 
-    - name: "{{ my_name }}  - unhold netatalk package"
-      ansible.builtin.shell: "/usr/bin/apt-mark unhold netatalk"
-      when: result.rc == 0
+    - block:
+      - name: "{{ my_name }}  - unhold netatalk package"
+        ansible.builtin.shell: "/usr/bin/apt-mark unhold netatalk"
 
-    - name: "{{ my_name }}  - remove package-based Netatalk"
-      ansible.builtin.package:
-        name: netatalk
-        state: absent
+      - name: "{{ my_name }}  - remove package-based Netatalk"
+        ansible.builtin.package:
+          name: netatalk
+          state: absent
 
-    - ansible.builtin.import_role:
-        name: retronas.role.package.latest
+      - ansible.builtin.import_role:
+          name: retronas.role.package.latest
 
-    - name: "{{ my_name }} - create install script"
-      ansible.builtin.template:
-        src: "templates/{{ my_file }}/{{ my_file }}.sh.j2"
-        dest: "{{ retronas_root }}/scripts/{{ my_file }}.sh"
-        owner: root
-        group: root
-        mode: '0755'
+      - name: "{{ my_name }} - create install script"
+        ansible.builtin.template:
+          src: "templates/{{ my_file }}/{{ my_file }}.sh.j2"
+          dest: "{{ retronas_root }}/scripts/{{ my_file }}.sh"
+          owner: root
+          group: root
+          mode: '0755'
 
-    - name: "{{ my_name }} - install from source"
-      ansible.builtin.shell: "{{ retronas_root }}/scripts/{{ my_file }}.sh 2>&1 | tee {{ retronas_root }}/log/{{ my_file }}.log"
+      - name: "{{ my_name }} - install from source"
+        ansible.builtin.shell: "{{ retronas_root }}/scripts/{{ my_file }}.sh 2>&1 | tee {{ retronas_root }}/log/{{ my_file }}.log"
 
-    - name: "{{ my_name }} - templates"
-      ansible.builtin.template:
-        src: "templates/{{ my_file }}/{{ item.name }}.j2"
-        dest: "{{ item.dest }}/{{ item.name }}"
-        owner: "{{ item.owner|default('root') }}"
-        group: "{{ item.group|default('root') }}"
-        mode: "{{ item.mode|default('0644') }}"
-      with_items: "{{ templates }}"
-      notify: "{{ my_name }} - Restart service"
+      - name: "{{ my_name }} - templates"
+        ansible.builtin.template:
+          src: "templates/{{ my_file }}/{{ item.name }}.j2"
+          dest: "{{ item.dest }}/{{ item.name }}"
+          owner: "{{ item.owner|default('root') }}"
+          group: "{{ item.group|default('root') }}"
+          mode: "{{ item.mode|default('0644') }}"
+        with_items: "{{ templates }}"
+        notify: "{{ my_name }} - Restart service"
 
-    - name: "{{ my_name }} - enable startup services"
-      ansible.builtin.service:
-        name: "{{ item }}"
-        state: started
-        enabled: true
-      with_items: "{{ services }}"
+      - name: "{{ my_name }} - enable startup services"
+        ansible.builtin.service:
+          name: "{{ item }}"
+          state: started
+          enabled: true
+        with_items: "{{ services }}"
+      when: 
+        - result is defined
+        - result.rc == 0
 
   handlers:
 
