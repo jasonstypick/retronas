@@ -3,6 +3,7 @@ scripts/*.sh
 !scripts/static/*.sh
 src
 log
+doc
 ansible/retronas_vars.yml
 etc/*
 config/installed.json
