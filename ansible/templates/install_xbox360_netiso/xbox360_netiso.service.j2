@@ -1,0 +1,13 @@
+[Unit]
+Description={{ my_name|upper }} service
+After=network.target
+
+[Service]
+User={{ retronas_user }}
+Type=simple
+Restart=always
+ExecStart=/opt/{{ module_name }}/netiso-srv -r -v {{ retronas_path }}/{{ system_key }}
+SyslogIdentifier={{ my_name|upper }}
+
+[Install]
+WantedBy=multi-user.target

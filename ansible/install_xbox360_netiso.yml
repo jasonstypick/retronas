@@ -1,0 +1,57 @@
+---
+- hosts: localhost
+  gather_facts: false
+
+  vars:
+    my_name: "XBox360 NetISO"
+    my_file: "install_xbox360_netiso"
+    module_name: "xbox360_netiso"
+    system_key: "xbox360"
+
+    paths:
+      - { name: "xbox360", dest: "{{ retronas_path }}", owner: "{{ retronas_user }}", group: "{{ retronas_group }}" }
+
+    templates:
+      - { name: "install_xbox360_netiso.sh", dest: "{{ retronas_root }}/scripts", mode: "0755" }
+      - { name: "xbox360_netiso.service", dest: "/etc/systemd/system" }
+      - { name: "dummy.iso", dest: "{{ retronas_path }}/{{ system_key }}" }
+
+  tasks:
+
+    - name: "{{ my_name }} - Load RetroNAS config"
+      ansible.builtin.include_vars: retronas_vars.yml
+
+    - ansible.builtin.import_role:
+        name: retronas.role.romdir
+
+    - ansible.builtin.import_role:
+        name: retronas.role.paths
+
+    - ansible.builtin.import_role:
+        name: retronas.role.templates
+
+    - name: "{{ my_name }} - symlinks"
+      ansible.builtin.file:
+        src: "{{ item.src }}"
+        dest: "{{ retronas_path }}/xbox360/{{ item.dest }}"
+        owner: "{{ retronas_user }}"
+        group: "{{ retronas_group }}"
+        state: link
+      with_items:
+        - { src: "../roms/microsoft/xbox360/games", dest: "games" }
+
+    - name: "{{ my_name }} - Install from git repo"
+      ansible.builtin.shell: "{{ retronas_root }}/scripts/{{ my_file }}.sh 2>&1 | tee {{ retronas_root }}/log/{{ my_file }}.log"
+      notify: "{{ my_name }} - Restart service"
+
+    - ansible.builtin.import_role:
+        name: retronas.role.system-config
+
+  handlers:
+
+    - name: "{{ my_name }} - Restart service"
+      ansible.builtin.service:
+        name: "xbox360_netiso.service"
+        state: restarted
+        enabled: true
+        daemon_reload: true

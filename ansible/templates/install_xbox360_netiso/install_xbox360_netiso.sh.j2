@@ -1,0 +1,26 @@
+#!/bin/bash
+
+ARCH=$(uname -m)
+GH_OWNER=tuxuser
+GH_REPO=netiso-srv
+DEST_PATH=/opt/xbox360_netiso
+
+RELEASE=$( curl -kLs https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/releases | jq -r ".[0].assets | map(select(.name | match (\"netiso-srv-${ARCH}-unknown-linux-musl\")))[-1] | .browser_download_url" )
+
+[ ! -d "${DEST_PATH}" ] && mkdir -p "${DEST_PATH}"
+cd "${DEST_PATH}"
+
+curl -kLsO "${RELEASE}"
+
+RELEASE_FILE=$( basename ${RELEASE} )
+if [ -f "${RELEASE_FILE}" ]
+then
+  unzip "$( basename ${RELEASE_FILE})" -d "_temp"
+  TARGET=$(find -type f -name "netiso-srv")
+  mv $TARGET ${DEST_PATH}
+  chmod +x ${DEST_PATH}/$( basename ${TARGET})
+else
+  echo "Failed"
+  exit 1
+fi
+
