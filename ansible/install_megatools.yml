@@ -1,12 +1,13 @@
 ---
 - hosts: localhost
+  gather_facts: true
 
   vars:
     my_name: "megatools"
     my_file: "install_megatools"
     module_name: "megatools"
 
-    packages:
+    packages_build:
       - build-essential
       - libglib2.0-dev
       - libssl-dev
@@ -17,6 +18,10 @@
       - meson
       - ninja-build
 
+    packages:
+      - megatools
+
+
     templates:
       - { name: "{{ my_file }}.sh", dest: "{{ retronas_root }}/scripts", mode: "0755" }
 
@@ -25,16 +30,29 @@
     - name: "{{ my_name }} - Load RetroNAS config"
       ansible.builtin.include_vars: retronas_vars.yml
 
-    - ansible.builtin.import_role:
-        name: retronas.role.package.latest
+    - block:
+      - name: "{{ my_name }} - Install distro package"
+        ansible.builtin.import_role:
+          name: retronas.role.package.latest
+      rescue:
+        - ansible.builtin.set_fact:
+            package_distro: false
+        - meta: clear_host_errors
 
-    - ansible.builtin.import_role:
-        name: retronas.role.templates
+    - block:
+      - ansible.builtin.import_role:
+          name: retronas.role.package.latest
+        vars:
+          - packages: "{{ packages_build }}"
 
-    - name: "{{ my_name }} - build source"
-      ansible.builtin.command:
-        cmd: "{{ retronas_root }}/scripts/{{ my_file }}.sh"
-        creates: "/usr/local/bin/megatools"
+      - ansible.builtin.import_role:
+          name: retronas.role.templates
+
+      - name: "{{ my_name }} - build source"
+        ansible.builtin.command:
+          cmd: "{{ retronas_root }}/scripts/{{ my_file }}.sh"
+          creates: "/usr/local/bin/megatools"
+      when: not package_distro|default(true)
 
     - ansible.builtin.import_role:
         name: retronas.role.system-config
