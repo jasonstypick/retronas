@@ -1,0 +1,94 @@
+---
+- hosts: localhost
+  gather_facts: true
+
+  vars:
+    my_name: "netmount"
+    my_file: "install_netmount"
+    module_name: "netmount"
+
+    packages:
+      - bzip2
+      - python3
+      - python3-yaml
+
+    systemd_units:
+      - { name: "netmount-drives-retronas", type: 'service', state: "started", enabled: "yes", restart: "yes", instance: "no" }
+
+    templates:
+      - { name: "{{ my_file }}.sh",         dest: "{{ retronas_root }}/scripts",         mode: "0755" }
+      - { name: "netmount-confman.py",      dest: "{{ retronas_root }}/scripts",         mode: "0755" }
+      - { name: "netmount-confman.sh",      dest: "{{ retronas_root }}/scripts",         mode: "0755" }
+      - { name: "retronas.yaml",            dest: "{{ retronas_path }}/config/netmount", mode: "0755" }
+
+    firewalld_rules:
+      - { zones: retro, service: netmount }
+
+    paths:
+        - dos
+        - config/netmount
+
+  tasks:
+
+    - name: "{{ my_name }} - Include systems map"
+      ansible.builtin.include_vars: "retronas_systems.yml"
+
+    - name: "{{ my_name }} - Load RetroNAS config"
+      ansible.builtin.include_vars: retronas_vars.yml
+
+    - ansible.builtin.import_role:
+        name: retronas.role.romdir
+
+    - ansible.builtin.import_role:
+        name: retronas.role.package.latest
+
+    - name: "{{ my_name }} - build top level"
+      ansible.builtin.file:
+        path: "{{ retronas_path }}/{{ item }}"
+        owner: "{{ retronas_user }}"
+        group: "{{ retronas_group }}"
+        state: directory
+        mode: "0775"
+      loop: "{{ paths }}"
+      notify: "{{ my_name }} - Restart service"
+
+    - ansible.builtin.import_role:
+        name: retronas.role.templates
+
+    - name: "{{ my_name }} - Install from git"
+      ansible.builtin.shell: "{{ retronas_root }}/scripts/{{ my_file }}.sh 2>&1 | tee {{ retronas_root }}/log/{{ my_file }}.log"
+      args:
+        creates: "/opt/netmount/netmount"
+
+    - name: "{{ my_name }} - Build service files"
+      ansible.builtin.shell: "python3 {{ retronas_root }}/scripts/netmount-confman.py"
+
+    - name: "{{ my_name }} - enable service(s)"
+      ansible.builtin.service:
+        name: "{{ item.name }}.{{ item.type }}"
+        state: "{{ item.state }}"
+        enabled: "{{ item.enabled }}"
+        daemon_reload: true
+      with_items: "{{ systemd_units }}"
+      when:
+        - item.instance == 'no'
+      notify: "{{ my_name }} - Restart service"
+
+    - ansible.builtin.import_role:
+        name: retronas.role.firewalld.port
+
+    - ansible.builtin.import_role:
+        name: retronas.role.system-config
+
+  handlers:
+
+    - name: "{{ my_name }} - Restart service"
+      ansible.builtin.service:
+        name: "{{ item.name }}.{{ item.type }}"
+        state: restarted
+        daemon_reload: true
+      with_items: "{{ systemd_units }}"
+      when:
+        - item.restart == 'yes'
+        - item.instance == 'no'
+

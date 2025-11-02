@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+
+import os
+import yaml
+import argparse
+
+#
+# this is written specifically for RetroNAS use it is fairly basic and hacky 
+# however some basic flexibilty is provided
+# - sai
+
+
+failed = False
+output_types = ["systemd"]
+binpath = "/opt/netmount/netmount"
+
+def log(s):
+    print(s)
+
+def error(s):
+    log(f"ERROR: {s}")
+    failed = True
+
+
+def check_state():
+    if failed:
+        exit(1)
+
+def gen_systemd(cli, service_name="netmount"):
+    systemd_path = "/etc/systemd/system"
+
+    if not os.access(systemd_path, os.W_OK):
+        error(f"Path not writable: {systemd_path}")
+
+    check_state()
+    service_file = os.path.join(systemd_path,f"{service_name.lower()}.service")
+    log(f"Writing {service_file}")
+
+    ncli = " ".join([binpath, cli])
+
+    with open(service_file, "w") as f:
+        f.write(f"""[Unit]
+Description={service_name}
+After=multi-user.target
+
+[Service]
+User=retronas
+Type=simple
+Restart=always
+ExecStart={ncli}
+TimeoutStartSec=0
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target  
+""")
+
+def format_cli(d):
+    cli = []
+
+    # program options
+    prog_options = []
+    if "options" in d:
+        for opt in d["options"]:
+            prog_options.append(f"--{opt}={d['options'][opt]}")
+    cli.append(" ".join(prog_options))
+
+    drives = []
+    for drive in d["drives"]:
+        if "letter" not in drive:
+            error("letter: must be defined in config")
+        if "path" not in drive:
+            error("path: must be defined in config")
+
+        check_state()
+        # drive options
+        letter = drive["letter"]
+        drive.pop("letter")
+        path = drive["path"]
+        drive.pop("path")
+
+        drive_options = []
+        for do in drive:
+            drive_options.append(f"{do}={drive[do]}")
+        drive_options = ",".join(drive_options)
+        
+    
+        drives.append(",".join([f"{letter}={path}",drive_options]))
+
+    cli = cli + drives
+    return(" ".join(cli))
+
+def main(args):
+    conf = args.conf_dir
+    output = args.output_type
+
+    for root, dirs, files in os.walk(conf):
+        for filename in files:
+            abs = os.path.join(root, filename)
+            y = {}
+            try:
+                with open(abs,'r') as f:
+                    y = yaml.safe_load(f)
+            except:
+                error(f"Failed to read yaml in {conf}")
+
+            check_state()
+            if not "drives" in y:
+                error("Invalid drive configuration file, drives: not found")
+
+            check_state()
+            cli = format_cli(y)
+
+            check_state()
+            if output == "systemd":
+                gen_systemd(cli, y["name"])
+            else:
+                error(f"Unsupported mode {output}")
+
+            check_state()
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--conf-dir', type=str, help='directory holding yaml configs for drives', default="{{ retronas_path }}/config/netmount")
+    parser.add_argument('--output-type', type=str, help='output type', choices=output_types, default="systemd")
+
+    args = parser.parse_args()
+    main(args)

@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -u
+
+DEST=/opt/netmount
+TDIR=$(mktemp -d)
+OWNER=jrohel
+REPO=NetMount
+
+echo "Downloading release ..."
+
+ARCH=$(uname -m)
+
+RELEASE=$( curl -kLs https://api.github.com/repos/${OWNER}/${REPO}/releases | jq -r ".[0].assets | map(select(.name | match (\"netmount.*linux-${ARCH}\")))[-1] | .browser_download_url" )
+[ -z "$RELEASE" ] && echo "Couldn't get release for arch: ${ARCH}" && exit 1
+
+
+cd ${TDIR}
+REL_NAME="$(basename ${RELEASE})"
+
+
+if `curl -OJL "${RELEASE}"`
+then
+  [ ! -d ${DEST} ] && mkdir -p ${DEST}
+  bzip2 -d ${REL_NAME}
+
+  rm netmount*.bz2
+  mv netmount* ${DEST}/
+
+  chmod +x ${DEST}/netmount*
+  find ${DEST} -executable -type f -iname "netmount*" -exec ln -s {} ${DEST}/netmount \;
+
+  rm -rf ${TDIR}
+  exit 0
+fi
+
+echo "Install failed!"
+exit 1

@@ -1,0 +1,11 @@
+#!/bin/bash
+_CONFIG=/opt/retronas/config/retronas.cfg
+source $_CONFIG
+source ${LIBDIR}/common.sh
+CLEAR
+
+python3 /opt/retronas/scripts/netmount-confman.py
+
+systemctl daemon-reload
+
+PAUSE
