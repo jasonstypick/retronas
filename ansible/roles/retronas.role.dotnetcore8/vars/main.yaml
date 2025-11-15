@@ -1,0 +1,12 @@
+my_name: "DotNet Core 8.X SDK"
+my_file: "install_dotnetcore8"
+
+packages:
+- wget
+- curl
+- aria2
+- coreutils
+
+srcdir: "{{ retronas_root }}/src/{{ my_file }}"
+version: 8.0.416
+arch: x64

@@ -1,8 +1,9 @@
 #!/bin/bash
 
-export PATH={{ retronas_root }}/bin/dotnetcore6:{{ retronas_root }}/bin/dotnetcore6/tools:${PATH}
-export DOTNET_ROOT={{ retronas_root }}/bin/dotnetcore6
-export DOTNET_INSTALL_DIR={{ retronas_root }}/bin/dotnetcore6
+DTVER=8
+export PATH={{ retronas_root }}/bin/dotnetcore${DTVER}:{{ retronas_root }}/bin/dotnetcore${DTVER}/tools:${PATH}
+export DOTNET_ROOT={{ retronas_root }}/bin/dotnetcore${DTVER}
+export DOTNET_INSTALL_DIR={{ retronas_root }}/bin/dotnetcore${DTVER}
 
 SRCDIR="{{ retronas_root }}/src"
 BINDIR="{{ retronas_root }}/bin"
@@ -29,7 +30,7 @@ dotnet build -c Release
 
 # Move the binaries into the bindir
 mkdir -p "${BINDIR}/webone"
-mv -vf ${SRCDIR}/webone/bin/Release/net6.0/* "${BINDIR}/webone/"
+mv -vf ${SRCDIR}/webone/bin/Release/net${DTVER}.0/* "${BINDIR}/webone/"
 
 # Cleanup
 rm -rf "${SRCDIR}"

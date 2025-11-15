@@ -45,7 +45,7 @@
       notify: "{{ my_name }} - Restart service"
 
     - ansible.builtin.import_role:
-        name: retronas.role.dotnetcore6
+        name: retronas.role.dotnetcore8
 
     - ansible.builtin.import_role:
         name: retronas.role.templates
