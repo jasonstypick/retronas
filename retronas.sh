@@ -74,6 +74,7 @@ cd $RNDIR
 #
 # MIGRATIONS
 #
+bash ${PCHDIR}/git-config.sh
 bash ${PCHDIR}/install-jq.sh
 bash ${PCHDIR}/update-retronas_vars.sh
 bash ${PCHDIR}/new-startup-file.sh

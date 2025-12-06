@@ -9,6 +9,7 @@
     packages:
       - git
       - curl
+      - unzip
 
     paths:
       - { name: "mister-organize", dest: "{{ retronas_path }}", owner: "{{ retronas_user }}", group: "{{ retronas_group }}" }
