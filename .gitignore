@@ -11,3 +11,4 @@ ansible/collections
 
 .fuse*
 CLAUDE.md
+.local_docs/
