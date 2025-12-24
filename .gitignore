@@ -10,3 +10,4 @@ config/installed.json
 ansible/collections
 
 .fuse*
+CLAUDE.md
