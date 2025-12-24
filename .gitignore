@@ -11,5 +11,6 @@ ansible/collections
 
 .fuse*
 CLAUDE.md
+.claude/
 local_docs/
 AGENTS.md
