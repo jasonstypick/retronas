@@ -975,6 +975,17 @@
         "group": "samba",
         "command": "romm_cifs",
         "args": ""
+      },
+      {
+        "index": "90",
+        "title": "retrobat",
+        "description": "RetroBat CIFS config",
+        "id": "retrobat-cifs",
+        "prompt": "",
+        "type": "install",
+        "group": "samba",
+        "command": "retrobat_cifs",
+        "args": ""
       }
     ]
   }
