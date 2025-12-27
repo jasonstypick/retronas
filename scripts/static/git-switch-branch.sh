@@ -14,7 +14,7 @@ SELECT_BRANCH() {
     git fetch --prune origin &> /dev/null
 
     PS3="Please select a branch ($OLDRNBRANCH): "
-    select BRANCH in $(git branch --remotes | awk -F'/' '!/HEAD/{print $2}' ) exit
+    select BRANCH in $(git branch --remotes | sed 's|origin/||' | grep -v HEAD) exit
     do  
 
     [ $BRANCH == "exit" ] && echo "Exiting..." && exit 0
