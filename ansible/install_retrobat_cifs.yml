@@ -20,30 +20,17 @@
     - name: "{{ my_name }} - Load RetroNAS config"
       ansible.builtin.include_vars: retronas_vars.yml
 
-    - name: "{{ my_name }} - Load systems map"
-      ansible.builtin.include_vars: retronas_systems.yml
-
-    - name: "{{ my_name }} - Filter system_map for retrobat only"
-      ansible.builtin.set_fact:
-        retrobat_system_map: "{{ system_map | selectattr('retrobat', 'defined') | selectattr('retrobat') | list }}"
-
-    - ansible.builtin.include_role:
+    - ansible.builtin.import_role:
         name: retronas.role.romdir
-        vars:
-          system_map: "{{ retrobat_system_map }}"
 
     - ansible.builtin.import_role:
         name: retronas.role.extradirs
 
-    - ansible.builtin.include_role:
+    - ansible.builtin.import_role:
         name: retronas.role.samba
-        vars:
-          system_map: "{{ retrobat_system_map }}"
 
-    - ansible.builtin.include_role:
+    - ansible.builtin.import_role:
         name: retronas.role.samba.system
-        vars:
-          system_map: "{{ retrobat_system_map }}"
 
     - ansible.builtin.import_role:
         name: retronas.role.system-config
