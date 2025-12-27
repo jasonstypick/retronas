@@ -23,6 +23,10 @@
     - ansible.builtin.import_role:
         name: retronas.role.romdir
 
+    - name: "{{ my_name }} - Filter system_map for retrobat only"
+      ansible.builtin.set_fact:
+        system_map: "{{ system_map | selectattr('retrobat', 'defined') | selectattr('retrobat') | list }}"
+
     - ansible.builtin.import_role:
         name: retronas.role.extradirs
 
