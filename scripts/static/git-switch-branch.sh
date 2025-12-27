@@ -4,6 +4,8 @@ _CONFIG=/opt/retronas/config/retronas.cfg
 source $_CONFIG
 source ${LIBDIR}/common.sh
 
+CHECK_ROOT
+
 
 # Get Available branches
 SELECT_BRANCH() {
@@ -14,7 +16,7 @@ SELECT_BRANCH() {
     git fetch --prune origin &> /dev/null
 
     PS3="Please select a branch ($OLDRNBRANCH): "
-    select BRANCH in $(git branch --remotes | sed 's|origin/||' | grep -v HEAD) exit
+    select BRANCH in $(git branch --remotes | sed 's|origin/||' | grep -v HEAD | sed 's|^  ||') exit
     do  
 
     [ $BRANCH == "exit" ] && echo "Exiting..." && exit 0
