@@ -986,6 +986,17 @@
         "group": "samba",
         "command": "retrobat_cifs",
         "args": ""
+      },
+      {
+        "index": "91",
+        "title": "retrobat-rgs",
+        "description": "RetroBat RGS (Robust Gaming System) CIFS config",
+        "id": "retrobat-rgs-cifs",
+        "prompt": "",
+        "type": "install",
+        "group": "samba",
+        "command": "retrobat_rgs_cifs",
+        "args": ""
       }
     ]
   }

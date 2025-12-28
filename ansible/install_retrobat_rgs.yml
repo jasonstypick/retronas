@@ -1,0 +1,36 @@
+---
+- hosts: localhost
+  gather_facts: false
+
+  vars:
+    my_name: "RetroBat RGS CIFS"
+    my_file: "install_retrobat_rgs"
+    module_name: "retrobat_rgs_cifs"
+    system_key: "retrobat_rgs"
+
+    top_level_paths:
+      - { name: "ROMS",   enabled: yes,  generic: "roms",   systems: yes }
+      - { name: "SAVES",  enabled: yes,  generic: "saves",  systems: yes }
+      - { name: "BIOS",   enabled: yes,  generic: "bios",   systems: yes }
+
+    internal_symlinks: []
+
+  tasks:
+
+    - name: "{{ my_name }} - Load RetroNAS config"
+      ansible.builtin.include_vars: retronas_vars.yml
+
+    - ansible.builtin.import_role:
+        name: retronas.role.romdir
+
+    - ansible.builtin.import_role:
+        name: retronas.role.extradirs
+
+    - ansible.builtin.import_role:
+        name: retronas.role.samba
+
+    - ansible.builtin.import_role:
+        name: retronas.role.samba.system
+
+    - ansible.builtin.import_role:
+        name: retronas.role.system-config
