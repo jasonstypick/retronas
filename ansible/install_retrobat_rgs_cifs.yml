@@ -4,7 +4,7 @@
 
   vars:
     my_name: "RetroBat RGS CIFS"
-    my_file: "install_retrobat_rgs"
+    my_file: "install_retrobat_rgs_cifs"
     module_name: "retrobat_rgs_cifs"
     system_key: "retrobat_rgs"
 
