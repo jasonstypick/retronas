@@ -4,6 +4,11 @@
 - name: "{{ my_name }} - Load RetroNAS config"
   ansible.builtin.include_vars: retronas_vars.yml
 
+- name: "{{ my_name }} - Filter system_map for specific platform"
+  ansible.builtin.set_fact:
+    system_map: "{{ system_map | selectattr(system_key, 'defined') | rejectattr(system_key, 'equalto', '') | list }}"
+  when: system_key is defined
+
 - name: "{{ my_name }} - build top level"
   ansible.builtin.file:
     path: "{{ retronas_path }}/{{ system_key }}"
